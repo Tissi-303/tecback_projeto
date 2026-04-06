@@ -2,9 +2,12 @@ package br.uniesp.si.techback.service;
 
 import br.uniesp.si.techback.dto.FilmeDTO;
 import br.uniesp.si.techback.mapper.FilmeMapper;
+import br.uniesp.si.techback.model.Diretor;
 import br.uniesp.si.techback.model.Filme;
+import br.uniesp.si.techback.model.Genero;
+import br.uniesp.si.techback.repository.DiretorRepository;
 import br.uniesp.si.techback.repository.FilmeRepository;
-import jakarta.transaction.Transactional;
+import br.uniesp.si.techback.repository.GeneroRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,116 +16,55 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class FilmeService {
 
-    private final FilmeRepository filmeRepository;
-    private final FilmeMapper filmeMapper;
+    private final FilmeRepository repository;
+    private final DiretorRepository diretorRepository;
+    private final GeneroRepository generoRepository;
+    private final FilmeMapper mapper;
 
     public List<FilmeDTO> listar() {
-        log.info("Buscando todos os filmes cadastrados");
-        try {
-            List<Filme> filmes = filmeRepository.findAll();
-            List<FilmeDTO> filmesDTO = filmes.stream()
-                    .map(filmeMapper::toDTO)
-                    .collect(Collectors.toList());
-            log.debug("Total de filmes encontrados: {}", filmesDTO.size());
-            return filmesDTO;
-        } catch (Exception e) {
-            log.error("Falha ao buscar filmes: {}", e.getMessage(), e);
-            throw e;
-        }
+        return repository.findAll().stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * @param id o ID do filme.
-     * @return o filme encontrado, ou lança uma exceção {@link RuntimeException} se o filme não existir.
-     */
+    public FilmeDTO salvar(FilmeDTO dto) {
+        log.info("Salvando filme: {}", dto.getTitulo());
+
+        Diretor diretor = null;
+        if (dto.getDiretorId() != null) {
+            diretor = diretorRepository.findById(dto.getDiretorId())
+                    .orElseThrow(() -> new RuntimeException("Diretor não encontrado"));
+        }
+
+        Genero genero = null;
+        if (dto.getGeneroId() != null) {
+            genero = generoRepository.findById(dto.getGeneroId())
+                    .orElseThrow(() -> new RuntimeException("Gênero não encontrado"));
+        }
+
+        Filme filme = mapper.toEntity(dto, diretor, genero);
+        return mapper.toDto(repository.save(filme));
+    }
+
     public FilmeDTO buscarPorId(Long id) {
-        log.info("Buscando filme pelo ID: {}", id);
-        Filme filme = filmeRepository.findById(id)
-                .map(filmeEncontrado -> {
-                    log.debug("Filme encontrado: ID={}, Título={}", filmeEncontrado.getId(), filmeEncontrado.getTitulo());
-                    return filmeEncontrado;
-                })
-                .orElseThrow(() -> {
-                    String mensagem = String.format("Filme não encontrado com o ID: %d", id);
-                    log.warn(mensagem);
-                    return new RuntimeException(mensagem);
-                });
-        return filmeMapper.toDTO(filme);
+        Filme filme = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Filme não encontrado"));
+        return mapper.toDto(filme);
     }
 
-    /**
-     * Atualiza um filme existente.
-     *
-     * @param id    o ID do filme a ser atualizado.
-     * @param filme o filme com as informações atualizadas.
-     * @return o filme atualizado.
-     */
-    @Transactional
-    public FilmeDTO atualizar(Long id, FilmeDTO filmeDTO) {
-        log.info("Atualizando filme ID: {}", id);
-        Filme filmeAtualizado = filmeRepository.findById(id)
-                .map(filmeExistente -> {
-                    log.debug("Dados atuais do filme: {}", filmeExistente);
-                    log.debug("Novos dados: {}", filmeDTO);
-                    filmeDTO.setId(id);
-                    Filme filmeParaAtualizar = filmeMapper.toEntity(filmeDTO);
-                    Filme filmeSalvo = filmeRepository.save(filmeParaAtualizar);
-                    log.info("Filme ID: {} atualizado com sucesso. Novo título: {}",
-                            id, filmeSalvo.getTitulo());
-                    return filmeSalvo;
-                })
-                .orElseThrow(() -> {
-                    String mensagem = String.format("Falha ao atualizar: filme não encontrado com o ID: %d", id);
-                    log.warn(mensagem);
-                    return new RuntimeException(mensagem);
-                });
-        return filmeMapper.toDTO(filmeAtualizado);
-    }
-
-    /**
-     * Salva um novo filme.
-     *
-     * @param filme o filme a ser salvo.
-     * @return o filme salvo.
-     */
-    @Transactional
-    public FilmeDTO salvar(FilmeDTO filmeDTO) {
-        log.info("Salvando novo filme: {}", filmeDTO.getTitulo());
-        try {
-            Filme filme = filmeMapper.toEntity(filmeDTO);
-            Filme filmeSalvo = filmeRepository.save(filme);
-            log.info("Filme salvo com sucesso. ID: {}, Título: {}", filmeSalvo.getId(), filmeSalvo.getTitulo());
-            return filmeMapper.toDTO(filmeSalvo);
-        } catch (Exception e) {
-            log.error("Falha ao salvar filme '{}': {}", filmeDTO.getTitulo(), e.getMessage(), e);
-            throw e;
-        }
-    }
-
-    /**
-     * Exclui um filme existente.
-     *
-     * @param id o ID do filme a ser excluído.
-     */
-    @Transactional
     public void excluir(Long id) {
-        log.info("Excluindo filme ID: {}", id);
-        if (!filmeRepository.existsById(id)) {
-            String mensagem = String.format("Falha ao excluir: filme não encontrado com o ID: %d", id);
-            log.warn(mensagem);
-            throw new RuntimeException(mensagem);
-        }
-        try {
-            filmeRepository.deleteById(id);
-            log.info("Filme ID: {} excluído com sucesso", id);
-        } catch (Exception e) {
-            log.error("Erro ao excluir filme ID {}: {}", id, e.getMessage(), e);
-            throw e;
-        }
+        repository.deleteById(id);
     }
 
+    public FilmeDTO atualizar(Long id, FilmeDTO dto) {
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Filme não encontrado");
+        }
+        dto.setId(id);
+        return salvar(dto); // Reutiliza a lógica de busca de diretor/gênero do salvar
+    }
 }

@@ -6,29 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_filme")
+@Table(name = "tb_favorito")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Filme {
+public class Favorito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String titulo;
-
-    @Column(length = 500)
-    private String sinopse;
-
-    private Integer anoLancamento;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "diretor_id")
-    private Diretor diretor;
-
-    @ManyToOne
-    @JoinColumn(name = "genero_id")
-    private Genero genero;
+    @JoinColumn(name = "filme_id", nullable = false)
+    private Filme filme;
 }
