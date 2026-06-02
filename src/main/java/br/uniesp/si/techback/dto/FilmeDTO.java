@@ -12,8 +12,10 @@ public class FilmeDTO {
     private Long id;
     private String titulo;
     private String sinopse;
-    private Integer anoLancamento;
+    private Integer anoLancamento; // Mantido o seu padrão
     private Long diretorId;
     private String nomeDiretor; // Útil para exibir na listagem
     private Long generoId;
+
+    private String notaOmdb;
 }

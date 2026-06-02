@@ -18,6 +18,9 @@ public class FilmeMapper {
         dto.setSinopse(entity.getSinopse());
         dto.setAnoLancamento(entity.getAnoLancamento());
 
+        // >>> ADICIONADO: Pega a nota do banco e manda para a tela
+        dto.setNotaOmdb(entity.getNotaOmdb());
+
         if (entity.getDiretor() != null) {
             dto.setDiretorId(entity.getDiretor().getId());
             dto.setNomeDiretor(entity.getDiretor().getNome());
@@ -38,6 +41,10 @@ public class FilmeMapper {
         entity.setTitulo(dto.getTitulo());
         entity.setSinopse(dto.getSinopse());
         entity.setAnoLancamento(dto.getAnoLancamento());
+
+        // >>> ADICIONADO: Pega a nota recebida e manda salvar no banco
+        entity.setNotaOmdb(dto.getNotaOmdb());
+
         entity.setDiretor(diretor);
         entity.setGenero(genero);
 

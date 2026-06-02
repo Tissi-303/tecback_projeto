@@ -1,36 +1,32 @@
 package br.uniesp.si.techback.model;
 
+import br.uniesp.si.techback.enums.TipoAssinatura;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_filme")
+@Table(name = "TB_ASSINATURA")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Filme {
+public class Assinatura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String titulo;
+    private TipoAssinatura tipo;
 
-    @Column(length = 500)
-    private String sinopse;
+    @Column(nullable = false)
+    private Double preco;
 
-    private Integer anoLancamento;
-
-    @ManyToOne
-    @JoinColumn(name = "diretor_id")
-    private Diretor diretor;
+    private Boolean ativo;
 
     @ManyToOne
-    @JoinColumn(name = "genero_id")
-    private Genero genero;
-
-    private String notaOmdb;
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }
