@@ -19,5 +19,5 @@ public class OmdbResponseDTO {
     private String linkPoster;
 
     @JsonProperty("imdbRating")
-    private String notaOmdb; // Esta é a nota que vamos capturar
+    private String notaOmdb; //
 }
