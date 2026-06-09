@@ -1,15 +1,18 @@
 package br.uniesp.si.techback.model;
 
+import br.uniesp.si.techback.enums.Perfil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tb_usuario")
+@Table(name = "tb_usuarios")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
 
     @Id
@@ -17,13 +20,22 @@ public class Usuario {
     private Long id;
 
     @Column(nullable = false)
-    private String nome;
+    private String nomeCompleto;
 
     @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String senha;
+    private String senhaHash;
 
-    private String cpf;
+    private LocalDate dataNascimento;
+
+    private String cpfCnpj;
+
+    @Enumerated(EnumType.STRING)
+    private Perfil perfil;
+
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
 }

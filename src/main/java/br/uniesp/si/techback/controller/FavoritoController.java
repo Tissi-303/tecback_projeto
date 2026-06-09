@@ -1,52 +1,34 @@
 package br.uniesp.si.techback.controller;
 
-import br.uniesp.si.techback.dto.FavoritoDTO;
+import br.uniesp.si.techback.model.Favorito;
 import br.uniesp.si.techback.service.FavoritoService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
 @RequestMapping("/favoritos")
-@RequiredArgsConstructor
-@Slf4j
 public class FavoritoController {
 
-    private final FavoritoService favoritoService;
+    @Autowired
+    private FavoritoService service;
 
     @GetMapping("/usuario/{usuarioId}")
-    public List<FavoritoDTO> listarPorUsuario(@PathVariable Long usuarioId) {
-        return favoritoService.listarPorUsuario(usuarioId);
+    public ResponseEntity<List<Favorito>> listarPorUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(service.listarPorUsuario(usuarioId));
     }
 
-    @PostMapping
-    public ResponseEntity<FavoritoDTO> criar(@RequestBody FavoritoDTO favoritoDTO) {
-        try {
-            FavoritoDTO salvo = favoritoService.salvar(favoritoDTO);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(salvo.getId())
-                    .toUri();
-            return ResponseEntity.created(location).body(salvo);
-        } catch (Exception e) {
-            log.error("Erro ao favoritar: {}", e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
+    @PostMapping("/usuario/{usuarioId}/conteudo/{conteudoId}")
+    public ResponseEntity<Favorito> adicionar(@PathVariable Long usuarioId, @PathVariable Long conteudoId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.adicionar(usuarioId, conteudoId));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        try {
-            favoritoService.excluir(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/usuario/{usuarioId}/conteudo/{conteudoId}")
+    public ResponseEntity<Void> remover(@PathVariable Long usuarioId, @PathVariable Long conteudoId) {
+        service.remover(usuarioId, conteudoId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiretorDTO {
+public class PlanoDTO {
 
     private Long id;
     private String nome;
-    private String nacionalidade; // Campo adicionado para receber os dados do Swagger
+    private String codigo;
+    private Double preco;
 }

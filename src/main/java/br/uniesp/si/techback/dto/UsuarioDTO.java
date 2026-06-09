@@ -1,32 +1,73 @@
 package br.uniesp.si.techback.dto;
 
-import br.uniesp.si.techback.validation.SenhaForte; // Import do validador que criamos
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.br.CPF; // Import oficial para validar CPF
+import br.uniesp.si.techback.enums.Perfil;
+import java.time.LocalDate;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class UsuarioDTO {
 
     private Long id;
-
-    @NotBlank(message = "O nome é obrigatório")
-    private String nome;
-
-    @Email(message = "Email inválido")
-    @NotBlank(message = "O email é obrigatório")
+    private String nomeCompleto;
     private String email;
-
-    @NotBlank(message = "A senha é obrigatória")
-    @SenhaForte // 1. Garante que a senha digita atende aos requisitos fortes
+    private LocalDate dataNascimento;
+    private String cpfCnpj;
+    private Perfil perfil;
     private String senha;
 
-    @NotBlank(message = "O CPF é obrigatório")
-    @CPF(message = "CPF inválido ou com dígito verificador incorreto") // 2. Valida o tamanho e a matemática do CPF
-    private String cpf;
+    public UsuarioDTO() {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public void setNomeCompleto(String nomeCompleto) {
+        this.nomeCompleto = nomeCompleto;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public String getCpfCnpj() {
+        return cpfCnpj;
+    }
+
+    public void setCpfCnpj(String cpfCnpj) {
+        this.cpfCnpj = cpfCnpj;
+    }
+
+    public Perfil getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(Perfil perfil) {
+        this.perfil = perfil;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
 }

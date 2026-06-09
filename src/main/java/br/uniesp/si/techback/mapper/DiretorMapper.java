@@ -12,7 +12,7 @@ public class DiretorMapper {
         DiretorDTO dto = new DiretorDTO();
         dto.setId(entity.getId());
         dto.setNome(entity.getNome());
-        dto.setNacionalidade(entity.getNacionalidade());
+        dto.setNacionalidade(entity.getNacionalidade()); // Corrigido para pegar a nacionalidade real!
         return dto;
     }
 

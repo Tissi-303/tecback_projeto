@@ -1,32 +1,31 @@
 package br.uniesp.si.techback.model;
 
-import br.uniesp.si.techback.enums.TipoAssinatura;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "TB_ASSINATURA")
+@Table(name = "tb_assinaturas")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Assinatura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoAssinatura tipo;
-
-    @Column(nullable = false)
-    private Double preco;
-
-    private Boolean ativo;
-
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "plano_id", nullable = false)
+    private Plano plano;
+
+    private LocalDate dataInicio;
+    private LocalDate dataFim;
+    private Boolean ativo;
 }

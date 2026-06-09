@@ -2,78 +2,87 @@ package br.uniesp.si.techback.service;
 
 import br.uniesp.si.techback.dto.AssinaturaDTO;
 import br.uniesp.si.techback.model.Assinatura;
+import br.uniesp.si.techback.model.Plano;
 import br.uniesp.si.techback.model.Usuario;
 import br.uniesp.si.techback.repository.AssinaturaRepository;
+import br.uniesp.si.techback.repository.PlanoRepository;
 import br.uniesp.si.techback.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class AssinaturaService {
 
-    private final AssinaturaRepository assinaturaRepository;
-    private final UsuarioRepository usuarioRepository; // Para buscar o dono da assinatura
+    @Autowired
+    private AssinaturaRepository repository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PlanoRepository planoRepository;
 
     public List<AssinaturaDTO> listarTodos() {
-        return assinaturaRepository.findAll().stream()
-                .map(this::convertEntityToDto)
+        return repository.findAll().stream()
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     public AssinaturaDTO buscarPorId(Long id) {
-        Assinatura assinatura = assinaturaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Assinatura não encontrada!"));
-        return convertEntityToDto(assinatura);
+        Assinatura assinatura = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Assinatura não encontrada."));
+        return convertToDTO(assinatura);
     }
 
-    public AssinaturaDTO salvar(AssinaturaDTO dto) {
+    public AssinaturaDTO criar(AssinaturaDTO dto) {
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário informado não existe!"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+        Plano plano = planoRepository.findById(dto.getPlanoId())
+                .orElseThrow(() -> new RuntimeException("Plano não encontrado."));
 
         Assinatura assinatura = new Assinatura();
-        assinatura.setTipo(dto.getTipo());
-        assinatura.setPreco(dto.getPreco());
-        assinatura.setAtivo(dto.getAtivo());
         assinatura.setUsuario(usuario);
+        assinatura.setPlano(plano);
+        assinatura.setDataInicio(dto.getDataInicio());
+        assinatura.setDataFim(dto.getDataFim());
+        assinatura.setAtivo(true);
 
-        Assinatura salva = assinaturaRepository.save(assinatura);
-        return convertEntityToDto(salva);
+        Assinatura salva = repository.save(assinatura);
+        return convertToDTO(salva);
     }
 
     public AssinaturaDTO atualizar(Long id, AssinaturaDTO dto) {
-        Assinatura assinaturaExistente = assinaturaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Assinatura não encontrada!"));
+        Assinatura existente = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Assinatura não encontrada."));
 
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário informado não existe!"));
+        Plano plano = planoRepository.findById(dto.getPlanoId())
+                .orElseThrow(() -> new RuntimeException("Plano não encontrado."));
 
-        assinaturaExistente.setTipo(dto.getTipo());
-        assinaturaExistente.setPreco(dto.getPreco());
-        assinaturaExistente.setAtivo(dto.getAtivo());        assinaturaExistente.setUsuario(usuario);
+        existente.setPlano(plano);
+        existente.setDataFim(dto.getDataFim());
+        existente.setAtivo(dto.getAtivo());
 
-        Assinatura atualizada = assinaturaRepository.save(assinaturaExistente);
-        return convertEntityToDto(atualizada);
+        Assinatura atualizada = repository.save(existente);
+        return convertToDTO(atualizada);
     }
 
     public void deletar(Long id) {
-        if (!assinaturaRepository.existsById(id)) {
-            throw new RuntimeException("Assinatura não existe!");
-        }
-        assinaturaRepository.deleteById(id);
+        Assinatura existente = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Assinatura não encontrada."));
+        repository.delete(existente);
     }
 
-    // Métodos Auxiliares de Conversão (Mapper manual)
-    private AssinaturaDTO convertEntityToDto(Assinatura entity) {
-        return new AssinaturaDTO(
-                entity.getId(),
-                entity.getTipo(),
-                entity.getPreco(),
-                entity.getAtivo(),
-                entity.getUsuario().getId()
-        );
+    private AssinaturaDTO convertToDTO(Assinatura assinatura) {
+        AssinaturaDTO dto = new AssinaturaDTO();
+        dto.setId(assinatura.getId());
+        dto.setUsuarioId(assinatura.getUsuario().getId());
+        dto.setPlanoId(assinatura.getPlano().getId());
+        dto.setDataInicio(assinatura.getDataInicio());
+        dto.setDataFim(assinatura.getDataFim());
+        dto.setAtivo(assinatura.getAtivo());
+        return dto;
     }
 }

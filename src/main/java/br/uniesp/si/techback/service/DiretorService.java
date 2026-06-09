@@ -57,7 +57,7 @@ public class DiretorService {
                 .orElseThrow(() -> new RuntimeException("Diretor não encontrado"));
 
         existente.setNome(dto.getNome());
-        existente.setNacionalidade(dto.getNacionalidade());
+        existente.setNome(dto.getNacionalidade());
 
         return mapper.toDto(repository.save(existente));
     }

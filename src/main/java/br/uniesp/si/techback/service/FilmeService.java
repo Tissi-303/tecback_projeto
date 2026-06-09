@@ -48,7 +48,7 @@ public class FilmeService {
                     .orElseThrow(() -> new RuntimeException("Gênero não encontrado"));
         }
 
-        // O mapper transforma o DTO em Entity normalmente
+        // O mapper transforma o DTO em Entity
         Filme filme = mapper.toEntity(dto, diretor, genero);
 
         // 2. INTEGRAÇÃO COM O OMDb ANTES DE SALVAR
@@ -83,6 +83,6 @@ public class FilmeService {
             throw new RuntimeException("Filme não encontrado");
         }
         dto.setId(id);
-        return salvar(dto); // Como o atualizar chama o salvar, ele ganha a busca do OMDb de graça!
+        return salvar(dto);
     }
 }

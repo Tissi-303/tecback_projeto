@@ -29,7 +29,7 @@ public class AssinaturaController {
 
     @PostMapping
     public ResponseEntity<AssinaturaDTO> criar(@Valid @RequestBody AssinaturaDTO dto) {
-        AssinaturaDTO salva = assinaturaService.salvar(dto);
+        AssinaturaDTO salva = assinaturaService.criar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
 
